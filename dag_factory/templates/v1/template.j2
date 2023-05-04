@@ -1,0 +1,76 @@
+from datetime import datetime, timedelta
+
+from airflow import DAG
+from airflow.operators.dummy import DummyOperator
+{%- if task.Operator == "SapDataServicesOperator" %}
+from libs.sap_data_services_operator import SapDataServicesOperator
+{%- endif %}
+{%- if task.Operator == "BigQueryExecuteQueryOperator" %}
+from libs.bigquery_operator import BigQueryExecuteQueryOperator
+{%- endif %}
+{%- if dependencies|length > 0 %}
+from libs.last_execution_external_task_sensor import LastExecutionExternalTaskSensor
+{%- endif %}
+
+default_args = {
+    'owner': 'Gerencia: {{head.Gerencia}}, Coord: {{head.Coord}}',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': {{head.Retries}},
+    'retry_delay': timedelta(minutes={{head.RetryDelay}})
+}
+
+dag = DAG(
+    'dag_{{head.DocId}}',
+    start_date=datetime.strptime('{{head.StartTime}}', '%Y-%m-%d %H:%M:%S'),
+    schedule_interval='{{head.Schedule}}',
+    default_args=default_args,
+    catchup=False,
+    tags=['{{head.Tags}}']
+)
+
+with dag:
+
+    {% for dependency in dependencies %}
+    sensor_{{dependency.TableId}} = LastExecutionExternalTaskSensor(
+        task_id='sensor_{{dependency.TableId}}',
+        external_dag_id='dag_{{dependency.TableId}}',
+        external_task_id='dq_{{dependency.TableId}}',
+        poke_interval={{dependency.PokeInterval}},
+        timeout=2*60,
+        failed_states=['failed', 'skipped', 'upstream_failed']
+    )
+    {% endfor %}
+
+    {%- if task.Operator == "SapDataServicesOperator" %}
+    job_{{head.DocId}} = SapDataServicesOperator(
+        task_id='job_{{head.DocId}}',
+        nameJob= '{{task.NameJob}}',
+        G_Delta_Inicio=None,
+        G_Delta_Fim=None,
+        timeout={{task.Timeout}},
+        pool='{{task.Pool}}',
+        trigger_rule='all_done'
+    )
+    {%- endif %}
+
+    {%- if task.Operator == "BigQueryExecuteQueryOperator" %}
+    job_{{head.DocId}} = BigQueryExecuteQueryOperator(
+        task_id='job_{{head.DocId}}',
+        sql= '{{task.Sql}}',
+        use_legacy_sql=False,
+        depends_on_past=False,
+        priority="BATCH"
+    )
+    {%- endif %}
+
+    dq_{{head.DocId}} = DummyOperator(
+        task_id='dq_{{head.DocId}}'
+    )
+
+    {%- for dependency in dependencies %}
+    sensor_{{dependency.TableId}} >> job_{{head.DocId}}
+    {%- endfor %}
+
+    job_{{head.DocId}} >> dq_{{head.DocId}}

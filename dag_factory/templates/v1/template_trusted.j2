@@ -1,0 +1,49 @@
+{% extends "template_base.j2" %}
+
+{%- block import %}
+{%- if task.Operator == "BigQueryExecuteQueryOperator" %}
+from libs.bigquery_operator import BigQueryExecuteQueryOperator
+{%- endif %}
+{%- if dependencies|length > 0 %}
+from libs.last_execution_external_task_sensor import LastExecutionExternalTaskSensor
+{%- endif %}
+{%- endblock %}
+
+{%- block operator %}
+
+    {% for dependency in dependencies %}
+    sensor_{{dependency.TableId}} = LastExecutionExternalTaskSensor(
+        task_id='sensor_{{dependency.TableId}}',
+        external_dag_id='dag_{{dependency.TableId}}',
+        external_task_id='dq_{{dependency.TableId}}',
+        poke_interval={{dependency.PokeInterval}}*60,
+        timeout=10*60,
+        failed_states=['failed', 'skipped', 'upstream_failed']
+    )
+
+    dq_{{dependency.TableId}} = BigQueryExecuteQueryOperator(
+        task_id='dq_{{dependency.TableId}}',
+        sql= 'CALL prc_data_quality',
+        use_legacy_sql=False,
+        depends_on_past=False,
+        priority="BATCH"
+    )
+    {% endfor %}
+
+    {%- if task.Operator == "BigQueryExecuteQueryOperator" %}
+    job_{{head.DocId}} = BigQueryExecuteQueryOperator(
+        task_id='job_{{head.DocId}}',
+        sql= '{{task.Sql}}',
+        use_legacy_sql=False,
+        depends_on_past=False,
+        priority="BATCH"
+    )
+    {%- endif %}
+
+{%- endblock %}
+
+{%- block dependency %}
+    {% for dependency in dependencies %}
+    sensor_{{dependency.TableId}} >> dq_{{dependency.TableId}} >> job_{{head.DocId}}
+    {%- endfor %}
+{%- endblock %}
