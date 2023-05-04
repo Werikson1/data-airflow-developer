@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
+      - name: Configurando o ambiente python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
@@ -35,7 +35,9 @@ jobs:
       - name: Inicializar o Airflow Database
         run: |
           airflow db init
-
+      
+      # Descomentar caso precise utilizar arquivos de variaveis 
+      
       #- name: Deploy das Variaveis do Airflow 
        # run: |
         #  for json_file in variables/*.json; do
