@@ -1,0 +1,26 @@
+{% extends "template_base.j2" %}
+
+{%- block import %}
+{%- if task.Operator == "SapDataServicesOperator" %}
+from libs.sap_data_services_operator import SapDataServicesOperator
+{%- endif %}
+{%- endblock %}
+
+{%- block operator %}
+
+    {%- if task.Operator == "SapDataServicesOperator" %}
+    job_{{head.DocId}} = SapDataServicesOperator(
+        task_id='job_{{head.DocId}}',
+        nameJob= '{{task.NameJob}}',
+        G_Delta_Inicio=None,
+        G_Delta_Fim=None,
+        timeout={{task.Timeout}},
+        pool='{{task.Pool}}',
+        trigger_rule='all_done'
+    )
+    {%- endif %}
+
+{%- endblock %}
+
+{%- block dependency %}
+{%- endblock %}

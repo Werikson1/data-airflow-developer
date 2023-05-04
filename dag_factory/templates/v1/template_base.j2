@@ -1,0 +1,38 @@
+from datetime import datetime, timedelta
+
+from airflow import DAG
+from airflow.operators.dummy import DummyOperator
+{%- block import %}
+{%- endblock %}
+
+default_args = {
+    'owner': 'Gerencia: {{head.Gerencia}}, Coord: {{head.Coord}}',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': {{head.Retries}},
+    'retry_delay': timedelta(minutes={{head.RetryDelay}})
+}
+
+dag = DAG(
+    'dag_{{head.DocId}}',
+    start_date=datetime.strptime('{{head.StartTime}}', '%Y-%m-%d %H:%M:%S'),
+    schedule_interval='{{head.Schedule}}',
+    default_args=default_args,
+    catchup=False,
+    tags=['{{head.Tags}}']
+)
+
+with dag:
+
+    {%- block operator %}
+    {%- endblock %}
+
+    dq_{{head.DocId}} = DummyOperator(
+        task_id='dq_{{head.DocId}}'
+    )
+
+    {%- block dependency %}
+    {%- endblock %}
+
+    job_{{head.DocId}} >> dq_{{head.DocId}}

@@ -1,0 +1,25 @@
+Head:
+  DocId: "tb_loja_venda_so"
+  Version: "v1"
+  StartTime: "2023-01-01 00:00:00"
+  Schedule: "0 9 * * *"
+  Retries: "Low"
+  RetryDelay: "Short"
+  Gerencia: "Front"
+  Coord: "RGM"
+  ValueStream: "Franqueado"
+  Tags: "factory"
+
+Table:
+  ProjectId: "raw-zone-005"
+  DatasetId: "raw_hana"
+  TableId: "tb_loja_venda_so"
+
+Task:
+  Operator: "SapDataServicesOperator"
+  NameJob: "JOB_GCP_BLZ_RAW_TB_EUD_BLZWEB_ADDRESS"
+  Pool: "sap-ds-pool"
+  Timeout: 480
+
+DataQuality:
+  Operator: "DummyOperator"

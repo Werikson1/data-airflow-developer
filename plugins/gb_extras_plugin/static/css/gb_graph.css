@@ -1,0 +1,79 @@
+span.deferred {
+    background-color: mediumpurple;
+}
+
+span.failed {
+    background-color: red;
+}
+
+span.queued {
+    background-color: gray;
+}
+
+span.running {
+    background-color: lime;
+}
+
+span.scheduled {
+    background-color: tan;
+}
+
+span.skipped {
+    background-color: hotpink;
+}
+
+span.success {
+    background-color: green;
+}
+
+span.up_for_reschedule {
+    background-color: turquoise;
+}
+
+span.up_for_retry {
+    background-color: gold;
+}
+
+span.upstream_failed {
+    background-color: orange;
+}
+
+g.node.deferred rect {
+    stroke: mediumpurple;
+}
+
+g.node.failed rect {
+    stroke: red;
+}
+
+g.node.queued rect {
+    stroke: gray;
+}
+
+g.node.running rect {
+    stroke: lime;
+}
+
+g.node.scheduled rect {
+    stroke: tan;
+}
+
+g.node.skipped rect {
+    stroke: hotpink;
+}
+
+g.node.success rect {
+stroke: green;
+}
+
+g.node.up_for_reschedule rect {
+    stroke: turquoise;
+}
+
+g.node.up_for_retry rect {
+    stroke: gold;
+}
+
+g.node.upstream_failed rect {
+    stroke: orange;
+}

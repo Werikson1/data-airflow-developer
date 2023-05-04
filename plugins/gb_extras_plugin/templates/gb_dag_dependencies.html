@@ -1,0 +1,156 @@
+{#
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+#}
+
+{% extends "airflow/main.html" %}
+
+{% block title %}Airflow - GB DAG Dependencies{% endblock %}
+
+{% block head_meta %}
+  {{ super() }}
+  <meta name="dependency_index" content="{{ url_for('GbDagDependenciesView.list') }}">
+  <meta name="autocomplete_url" content="{{ url_for('GbDagDependenciesView.autocomplete') }}">
+{% endblock %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for_asset('graph.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('gb_extras.static', filename='css/gb_graph.css') }}">
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+  <h2>
+    {{ title }}
+  </h2>
+  <div class="row dag-view-tools">
+    <div class="col-sm-6">
+        <form id="tags_filter_form">
+          <div class="form-group search-input col-sm-6">
+            <select multiple name="tags" id="tags_filter" class="select2-drop-mask form-control">
+              {% for tag in tags %}
+                <option value="{{ tag.name }}" {% if tag.selected %}selected{% endif %}>{{ tag.name }}</option>
+              {% endfor %}
+            </select>
+            {% if tags_filter|length > 0 %}
+              <button type="reset" aria-label="Clear all tags" class="btn btn-default btn-sm material-icons search-input__clear-btn" style="right: 16px">cancel</button>
+            {% endif %}
+          </div>
+        </form>
+        <form id="states_filter_form"></form>
+          <div class="form-group search-input col-sm-6">
+            <select name="state" id="states_filter" class="select2 js-states form-control">
+              <option value="">All Run States</option>
+              {% for state in states %}
+                <option value="{{state}}" {% if states_filter == state %} selected {% endif %}>{{state}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="col-sm-6 no-x-padding">
+        <form id="search_form">
+          <div class="form-group search-input" style="width: 100%;">
+            <label for="dag_query" class="sr-only">Search DAGs</label>
+            <input type="search" id="dag_query" class="typeahead form-control search-input__input"
+                   data-provide="typeahead" style="width:100%;" value="{{ search_query }}" autocomplete="off"
+                   placeholder="Search DAGs">
+            {% if search_query %}
+              <button type="reset" aria-label="Clear DAG Search Term"
+                      class="btn btn-default btn-sm material-icons search-input__clear-btn">cancel
+              </button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    <!--
+    <div class="col-md-4 text-right">
+      <div class="input-group" style="float: right">
+      <input type="text" id="searchbox" class="form-control" placeholder="Search for..." onenter="null">
+    </div>
+    -->
+    <label for="deps-filter" class="h5" style="float: right; margin-right: 5px; display: none">
+      <input type="checkbox" id="deps-filter" checked> Only show DAGs with dependencies
+    </label>
+    </div>
+  </div>
+  <hr/>
+  <div class="legend-row">
+    <div>
+      <span class="legend-item dag">dag</span>
+      <span class="legend-item trigger">trigger</span>
+      <span class="legend-item sensor">sensor</span>
+    </div>
+    <div style="float:right">Last refresh: <time datetime="{{ last_refresh }}">{{ last_refresh }}</time></div>
+  </div>
+  <div id="error" style="display: none; margin-top: 10px;" class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span id="error_msg">Oops.</span>
+  </div>
+  <br/>
+  <div class="svg-wrapper">
+    <div class="graph-svg-wrap">
+      <svg id="graph-svg" width="{{ width }}" height="{{ height }}">
+        <g id="dig" transform="translate(20,20)"></g>
+        <filter id="blur-effect-1">
+          <feGaussianBlur stdDeviation="3"></feGaussianBlur>
+        </filter>
+      </svg>
+    </div>
+  </div>
+<!-- Modal for dag -->
+  <div class="modal fade" id="dagModal" tabindex="-1" role="dialog" aria-labelledby="dagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="dagModalLabel">
+            <span class="text-muted"></span> <span id="m_dag_id"></span>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <span class="btn-group col-md-8">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <form method="get" class="form-inline">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" class="form-control" id="m_input_dag_id" name="dag_id">
+              <button type="submit" class="btn">Centralizar</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block tail %}
+  {{ super() }}
+  <script src="{{ url_for_asset('d3.min.js') }}"></script>
+  <script src="{{ url_for_asset('dagre-d3.min.js') }}"></script>
+  <script src="{{ url_for_asset('d3-shape.min.js') }}"></script>
+  <script src="{{ url_for_asset('d3-tip.js') }}"></script>
+  <script>
+    let dagNodes = {{ nodes|tojson }};
+    let edges = {{ edges|tojson }};
+    const arrange = '{{ arrange }}';
+  </script>
+  <script src="{{ url_for('gb_extras.static', filename='js/gb_dag_dependencies.js') }}"></script>
+{% endblock %}

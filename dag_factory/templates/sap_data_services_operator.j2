@@ -1,0 +1,9 @@
+job_{{job_name}} = SapDataServicesOperator(
+    task_id='job_{{job_name}}',
+    nameJob= "JOB_GCP_BLZ_RAW_TB_EUD_BLZWEB_ADDRESS",
+    G_Delta_Inicio=None,
+    G_Delta_Fim=None,
+    timeout={{timeout}},
+    pool='{{pool}}',
+    trigger_rule='all_done'
+)
