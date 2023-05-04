@@ -36,11 +36,11 @@ jobs:
         run: |
           airflow db init
 
-      - name: Deploy das Variaveis do Airflow 
-        run: |
-          for json_file in variables/*.json; do
-            airflow variables import "$json_file"
-          done
+      #- name: Deploy das Variaveis do Airflow 
+       # run: |
+        #  for json_file in variables/*.json; do
+         #   airflow variables import "$json_file"
+          #done
 
       - name: Run Airflow DAG validation
         run: |
