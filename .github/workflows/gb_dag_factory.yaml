@@ -1,12 +1,5 @@
 name: Generate DAG from YAML
 
-on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - '**/dag_factory/config/*.yaml'
-
 jobs:
   generate_dag:
     runs-on: ubuntu-latest
