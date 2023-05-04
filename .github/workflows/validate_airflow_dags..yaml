@@ -4,7 +4,7 @@ name: Validate Airflow DAGs
     branches:
       - main
     paths:
-      - dags/*.py
+      - dags/generated/*.py
   pull_request:
     branches:
       - main
@@ -45,3 +45,4 @@ jobs:
       - name: Run Airflow DAG validation
         run: |
           find ./dags -name "*.py" -exec python {} \; -exec echo -n "Exit code: $?; " \; | grep -q "Exit code: 0;" || exit 1
+
