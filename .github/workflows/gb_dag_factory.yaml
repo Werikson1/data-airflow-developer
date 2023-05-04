@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'dag_factory/config/*.yaml'
+      - '**/dag_factory/config/*.yaml'
 
 jobs:
   generate_dag:
