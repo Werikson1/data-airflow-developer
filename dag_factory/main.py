@@ -8,8 +8,8 @@ def loadconfig(path: str, config: str) -> any:
         content = f.read()
     return yaml.safe_load(content)
 
-def invoke(json_config: any, output_path: str) -> None:
-    Handler(json_config, output_path).execute()
+def invoke(json_config: any) -> None:
+    Handler(json_config).execute()
 
 if __name__ == "__main__":
     os.environ['CONFIG_PATH'] = '/config'
@@ -19,11 +19,12 @@ if __name__ == "__main__":
     os.environ['DAG_FOLDER'] = 'dags/generated/'
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=str, required=True, help="Input YAML file path")
-    parser.add_argument("--output", type=str, required=True, help="Output DAG file path")
+    parser.add_argument("-i", "--input", nargs='+', help="Dag config filename(s)", required=True)
+    parser.add_argument("-o", "--output", help="Output path for generated DAG files", required=True)
     args = parser.parse_args()
 
     path = os.path.dirname(os.path.abspath(__file__)) + os.environ['CONFIG_PATH']
 
-    json_config = loadconfig(path, args.input)
-    invoke(json_config, args.output)
+    for config in args.input:
+        json_config = loadconfig(path, os.path.basename(config))
+        invoke(json_config)

@@ -30,7 +30,9 @@ jobs:
 
       - name: Run DAG generator
         run: |
-          python dag_factory/main.py  --input dag_factory/config/*.yaml --output dags/generated/new_dag_file.py
+          for config_file in dag_factory/config/*.yaml; do
+            python dag_factory/main.py --input "$config_file" --output dags/generated/
+          done
 
       - name: Commit and push DAG files
         run: |
