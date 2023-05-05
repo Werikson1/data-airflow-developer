@@ -15,8 +15,6 @@ on:
 jobs:
   generate_dag:
     runs-on: ubuntu-latest
-    env:
-      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 
     steps:
       - name: Checkout repository
@@ -36,13 +34,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set up SSH
-        run: |
-          set -e
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 
       - name: Run DAG generator
