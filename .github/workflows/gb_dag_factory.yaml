@@ -52,6 +52,7 @@ jobs:
 
       - name: Validando a DAG
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)/.dags
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/dags
           find ./dags/generated -name "*.py" -exec python {} \; -exec echo -n "Exit code: $?; " \; | grep -q "Exit code: 0;" || exit 1
+
         
