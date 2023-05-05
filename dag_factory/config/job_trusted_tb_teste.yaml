@@ -1,0 +1,27 @@
+Head:
+  DocId: "tb_teste"
+  Version: "v1"
+  StartTime: "2023-01-01 00:00:00"
+  Schedule: "0 9 * * *"
+  Retries: "Low"
+  RetryDelay: "Short"
+  Gerencia: "Front"
+  Coord: "RGM"
+  ValueStream: "Franqueado"
+  Tags: "factory"
+
+Table:
+  ProjectId: "trusted-zone"
+  DatasetId: "sellout"
+  TableId: "tb_real_dia_cupom"
+
+Task:
+  Operator: "BigQueryExecuteQueryOperator"
+  Sql: "CALL prc_load_tb_real_dia_cupom"
+
+DataQuality:
+  Operator: "DummyOperator"
+
+Dependencies:
+  - TableId: tb_loja_venda_so
+    PokeInterval: "Short"
