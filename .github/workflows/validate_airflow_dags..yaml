@@ -1,5 +1,5 @@
 name: Validate Airflow DAGs
-'on':
+on:
   push:
     branches:
       - main
