@@ -15,7 +15,7 @@ default_args = {
 }
 
 dag = DAG(
-    'dag_tb_real_dia_TESTE',
+    'dag_tb_teste_developer1',
     start_date=datetime.strptime('2023-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'),
     schedule_interval='0 9 * * *',
     default_args=default_args,
@@ -43,18 +43,18 @@ with dag:
         priority="BATCH"
     )
     
-    job_tb_real_dia_TESTE = BigQueryExecuteQueryOperator(
-        task_id='job_tb_real_dia_TESTE',
+    job_tb_teste_developer1 = BigQueryExecuteQueryOperator(
+        task_id='job_tb_teste_developer1',
         sql= 'CALL prc_load_tb_real_dia_cupom',
         use_legacy_sql=False,
         depends_on_past=False,
         priority="BATCH"
     )
 
-    dq_tb_real_dia_TESTE = DummyOperator(
-        task_id='dq_tb_real_dia_TESTE'
+    dq_tb_teste_developer1 = DummyOperator(
+        task_id='dq_tb_teste_developer1'
     )
     
-    sensor_tb_loja_venda_so >> dq_tb_loja_venda_so >> job_tb_real_dia_TESTE
+    sensor_tb_loja_venda_so >> dq_tb_loja_venda_so >> job_tb_teste_developer1
 
-    job_tb_real_dia_TESTE >> dq_tb_real_dia_TESTE
+    job_tb_teste_developer1 >> dq_tb_teste_developer1
