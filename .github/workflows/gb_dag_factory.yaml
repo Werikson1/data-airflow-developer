@@ -45,3 +45,11 @@ jobs:
           git add dags/generated/*.py
           git commit -m "DAG gerada com sucesso!!!" || echo "No changes to commit"
           git push || echo "No changes to push"
+      
+      - name: Inicializar o Airflow Database
+        run: |
+          airflow db init
+
+      - name: Validando a DAG
+        run: |
+          find ./dags/generated -name "*.py" -exec python {} \; -exec echo -n "Exit code: $?; " \; | grep -q "Exit code: 0;" || exit 1        
