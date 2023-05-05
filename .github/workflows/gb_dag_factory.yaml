@@ -46,7 +46,7 @@ jobs:
           set -e
           git config --global user.name "GitHub Actions"
           git config --global user.email "noreply@github.com"
-          git dags/generated/*.py
+          git add dags/generated/*.py
           git commit -m "Generated DAG files from YAML" || echo "No changes to commit"
           git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
           git push || echo "No changes to push"
