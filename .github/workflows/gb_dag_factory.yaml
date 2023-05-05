@@ -5,29 +5,22 @@ on:
       - main
     paths:
       - '**/dag_factory/config/*.yaml'
-    paths-ignore:
-      - 'dags/generated/*.py'
   pull_request:
     branches:
       - main
     paths:
       - '**/dag_factory/config/*.yaml'
-    types:
-      - opened
-      - synchronize
       
 jobs:
   GB_DAG_FACTORY:
     runs-on: ubuntu-latest
-    if: "github.actor != 'github-actions[bot]'"
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT  }}
+          #token: ${{ secrets.GH_PAT  }}
 
       - name: Configurando o ambiente Python
         uses: actions/setup-python@v2
@@ -46,6 +39,7 @@ jobs:
 
       - name: Commit e push do arquivo dag.py
         run: |
+          set -e
           git config --global user.name "GitHub Actions"
           git config --global user.email "noreply@github.com"
           git add dags/generated/*.py
