@@ -39,7 +39,7 @@ jobs:
       - name: Run DAG generator
         run: |
           set -e
-          python **/dag_factory/main.py --output dags/generated/
+          python dag_factory/main.py --output dags/generated/
 
       - name: Commit and push DAG files
         run: |
