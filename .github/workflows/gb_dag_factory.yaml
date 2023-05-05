@@ -1,5 +1,12 @@
 name: GB DAG FACTORY
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/dag_factory/config/*.yaml'
+    paths-ignore:
+      - 'dags/generated/*.py'
   pull_request:
     branches:
       - main
@@ -7,11 +14,12 @@ on:
       - '**/dag_factory/config/*.yaml'
     types:
       - opened
-      - synchronize  
+      - synchronize
       
 jobs:
   GB_DAG_FACTORY:
     runs-on: ubuntu-latest
+    if: "github.actor != 'github-actions[bot]'"
 
     steps:
       - name: Checkout repository
@@ -38,11 +46,8 @@ jobs:
 
       - name: Commit e push do arquivo dag.py
         run: |
-          if [ "${{ github.actor }}" != "github-actions[bot]" ]; then
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "noreply@github.com"
-            git add dags/generated/*.py
-            git commit -m "DAG gerada com sucesso!!!" || echo "No changes to commit"
-            git push || echo "No changes to push"
-          fi
-
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "noreply@github.com"
+          git add dags/generated/*.py
+          git commit -m "DAG gerada com sucesso!!!" || echo "No changes to commit"
+          git push || echo "No changes to push"
