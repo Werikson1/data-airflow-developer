@@ -37,17 +37,21 @@ jobs:
 
       - name: Set up SSH
         run: |
+          set -e
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+
       - name: Run DAG generator
         run: |
+          set -e
           python dag_factory/main.py --output dags/generated/
 
       - name: Commit and push DAG files
         run: |
+          set -e
           git config --global user.name "GitHub Actions"
           git config --global user.email "noreply@github.com"
           git add dags/generated/*.py
