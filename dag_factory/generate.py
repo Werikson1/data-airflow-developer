@@ -4,15 +4,15 @@ from jinja2 import Template, Environment, FileSystemLoader
 
 from util import RetryTimes, DelayTime, SensorWaitTime
 
-
 class Handler:
     available_operator = [
         'SapDataServicesOperator',
         'BigQueryExecuteQueryOperator'
     ]
 
-    def __init__(self, data):
+    def __init__(self, data, output):
         self.data = data
+        self.output = output
 
     def execute(self):
         try:
@@ -108,7 +108,7 @@ class Handler:
 
     def create_dag(self):
         try:
-            with open(os.environ['DAG_FOLDER'] + self.filename, 'w+') as file:
+            with open(f"{self.output}/{self.filename}", 'w+') as file:
                 file.write(self.dag)
 
         except Exception as e:
