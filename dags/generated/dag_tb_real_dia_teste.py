@@ -57,4 +57,4 @@ with dag:
     
     sensor_tb_loja_venda_so >> dq_tb_loja_venda_so >> job_tb_real_dia_TESTE
 
-    job_tb_real_dia_TESTE >> dq_tb_real_dia_TESTE
+    job_tb_real_dia_TESTE >> dq_tb_real_dia_TESTE 
