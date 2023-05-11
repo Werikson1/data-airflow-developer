@@ -1,5 +1,5 @@
 Head:
-  DocId: "tb_teste_developer1"
+  DocId: "tb_teste_dev"
   Version: "v1"
   StartTime: "2023-01-01 00:00:00"
   Schedule: "0 9 * * *"
@@ -13,7 +13,7 @@ Head:
 Table:
   ProjectId: "trusted-zone"
   DatasetId: "sellout"
-  TableId: "tb_real_dia_cupom"
+  TableId: "tb_teste_dev"
 
 Task:
   Operator: "BigQueryExecuteQueryOperator"
