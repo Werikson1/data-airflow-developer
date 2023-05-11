@@ -108,6 +108,8 @@ class Handler:
 
     def create_dag(self):
         try:
+            with open(os.environ['DAG_FOLDER'] + self.filename, 'w+') as file:
+                file.write(self.dag)
             with open(f"{self.output}/{self.filename}", 'w+') as file:
                 file.write(self.dag)
 
