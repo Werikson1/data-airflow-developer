@@ -1,5 +1,5 @@
 ARG AIRFLOW_UID="50000"
-FROM apache/airflow:2.3.4
+FROM apache/airflow:2.6.1
 
 # Correção do pacote da azure
 RUN pip uninstall  --yes azure-storage \
