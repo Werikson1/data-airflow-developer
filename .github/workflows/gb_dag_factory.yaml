@@ -53,8 +53,10 @@ jobs:
       - name: Validando a DAG
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)/dags
-          find ./dags/generated -name "*.py" -exec python {} \; > /dev/null
-          if [ $? -ne 0 ]; then exit 1; fi
+          for file in $(find ./dags/generated -name "*.py"); do
+            python $file
+            if [ $? -ne 0 ]; then exit 1; fi
+          done
 
 
         
