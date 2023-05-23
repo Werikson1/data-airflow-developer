@@ -1,0 +1,27 @@
+Head:
+  DocId: "tb_test_cr_cicd"
+  Version: "v1"
+  StartTime: "2023-01-01 00:00:00"
+  Schedule: "0 9 * * *"
+  Retries: "Low"
+  RetryDelay: "Short"
+  Gerencia: "Front"
+  Coord: "Consumer2"
+  ValueStream: "Franqueado"
+  Tags: "factory,cr"
+
+Table:
+  ProjectId: "trusted-zone"
+  DatasetId: "sellout"
+  TableId: "tb_test_cr_cicd"
+
+Task:
+  Operator: "BigQueryExecuteQueryOperator"
+  Sql: "CALL prc_load_tb_test_cr_cicd"
+
+DataQuality:
+  Operator: "DummyOperator"
+
+Dependencies:
+  - TableId: tb_test_cr_cicd
+    PokeInterval: "Short"
