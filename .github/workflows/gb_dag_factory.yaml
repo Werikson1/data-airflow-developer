@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: werikson/gb_airflow:v1.0
+      image: werikson/gb_airflow:cicd
       
     steps:
       - name: Checkout repository
