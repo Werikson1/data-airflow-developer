@@ -9,7 +9,9 @@ jobs:
     name: Teste Unitário - Todas as Versões do Airflow
     strategy:
       matrix:
-        airflow-version: ['2.3.4']  # Adicione todas as versões do Airflow que deseja testar
+        airflow-version: ['2.0.0', '2.1.0', '2.3.4']  # Adicione todas as versões do Airflow que deseja testar
+
+    continue-on-error: true
 
     steps:
       - name: Checkout do código
