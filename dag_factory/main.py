@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help="Dag config filename")
-    parser.add_argument("-o", "--output", help="Output folder for generated DAG files", default='dags/generated/')
+    parser.add_argument("-o", "--output", help="Pasta Output para arquivo DAG gerado", default='dags/generated/')
     args = parser.parse_args()
 
     output = args.output

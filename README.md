@@ -3,34 +3,42 @@
 - Você precisa alterar para o runner da sua VS. Em caso de dúvida procure o canal no slack de devops
 ```
 
-# Nome do Projeto
+# Melhorias no Airflow
 
-Adicione aqui a descrição do projeto.
+Repositório temporário para o projeto de melhorias no Airflow
+
+Dúvidas entrar em contato no canal [#tmp-airflow-melhorias](https://grupoboticario-corp.slack.com/archives/C04BJSNEXCM)
 
 ## Qual o objetivo deste repositório?
 
-## Quais são os outros repositórios desta solução?
-
----
-
-<p align="center">
-    Adicione aqui badges de qualidade do código
-</p>
-
----
-
-## Urls
-| Environment  |  Url  |
-| - | - |
-|  Sandbox |  xxx |
-|  Produção |  xxx |
-|  Sonar |  xxx |
+Repositório temporário para o projeto de melhorias no Airflow
 
 ## CI/CD
-Link da ferramenta de CI e CD
+Atualizar
 
 ## Setup
-Adicione aqui os passos para fazer o setup do ambiente e instalação do projeto
+Atualizar
 
 ## Testes
-Descreva aqui como executar os testes e quais testes a aplicação possui.
+
+Para executar todos os testes acesse o container do scheduller
+```sh
+docker exec -it data-temp-airflow_airflow-scheduler_1 bash
+```
+
+Execute a chamada do pytest
+```sh
+pytest
+```
+
+Outros comandos uteis
+Adicione o argumento `-s` para que o pytest mostre no console os prints
+Executar todos os testes de apenas um diretório especifico
+```sh
+pytest tests/sensor -s
+```
+Executar um testes especifico
+```sh
+pytest tests/sensor/test_gb_external_task_sensor.py::TestGbExternalTaskSensor::test_gb_external_task_sensor_last_valid -s
+```
+

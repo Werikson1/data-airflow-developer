@@ -5,14 +5,14 @@
 from libs.bigquery_operator import BigQueryExecuteQueryOperator
 {%- endif %}
 {%- if dependencies|length > 0 %}
-from libs.last_execution_external_task_sensor import LastExecutionExternalTaskSensor
+from libs.gb_external_task_sensor import GbExternalTaskSensor
 {%- endif %}
 {%- endblock %}
 
 {%- block operator %}
 
     {% for dependency in dependencies %}
-    sensor_{{dependency.TableId}} = LastExecutionExternalTaskSensor(
+    sensor_{{dependency.TableId}} = GbExternalTaskSensor(
         task_id='sensor_{{dependency.TableId}}',
         external_dag_id='dag_{{dependency.TableId}}',
         external_task_id='dq_{{dependency.TableId}}',

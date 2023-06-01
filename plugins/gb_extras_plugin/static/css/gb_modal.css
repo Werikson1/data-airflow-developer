@@ -1,0 +1,42 @@
+/* modal menu */
+#dagModal .nav {
+    margin-bottom: 10px;
+}
+
+/* button close */
+#dagModal .nav-pills>li:last-child {
+    float: right;
+}
+
+#dagModal .nav-pills>li:hover {
+    background-color: #c0defb;
+    cursor: pointer;
+}
+
+#dagModal .nav-pills>li .btn-custom a {
+    border-radius: 4px;
+    border: 0;
+    color: #365f84;
+    padding: 10px 15px;
+    display: block;
+    position: relative;
+}
+
+#dagModal .table {
+    margin-bottom: 0px;
+}
+
+.table>thead>tr>th {
+    background-color: #EDF2F7;
+    border-bottom: 2px solid #CBD5E0;
+}
+
+.table>tbody>tr>td:first-child {
+    min-width: 150px;
+    width: 45%;
+}
+
+.table>tbody>tr>th,
+.table>tbody>tr>td {
+    border-top: none;
+}

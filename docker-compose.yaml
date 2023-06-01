@@ -7,6 +7,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
+    - ./tests:/opt/airflow/tests
     - ./airflow.cfg:/opt/airflow/airflow.cfg
   environment:
     &airflow-common-env

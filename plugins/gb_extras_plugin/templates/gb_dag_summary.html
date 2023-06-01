@@ -1,26 +1,133 @@
-<table class="table table-striped table-bordered"></table>
+<div>
+    <ul class="nav nav-pills">
+        <li>
+            <a href="{{ url_for('Airflow.grid', dag_id=dag_summary.dag_id) }}" target="_blank">
+                <span class="material-icons" aria-hidden="true">grid_on</span>
+                Grid
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('Airflow.graph', dag_id=dag_summary.dag_id) }}" target="_blank">
+                <span class="material-icons" aria-hidden="true">account_tree</span>
+                Graph
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('Airflow.dag_details', dag_id=dag_summary.dag_id) }}" target="_blank">
+                <span class="material-icons" aria-hidden="true">details</span>
+                Details
+            </a>
+        </li>
+        <li>
+            <div class="btn-group btn-custom">
+                <div class="dropdown">
+                    <a aria-label="Trigger DAG"
+                        class="trigger-dropdown-btn"
+                        data-toggle="dropdown">
+                        <span class="material-icons" aria-hidden="true">play_arrow</span>
+                        Trigger
+                    </a>
+                    <ul class="dropdown-menu trigger-dropdown-menu">
+                        <li>
+                        <form method="POST" action="{{ url_for('Airflow.trigger') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="dag_id" value="{{ dag_summary.dag_id }}">
+                            <input type="hidden" name="unpause" value="True">
+                            <button type="submit" class="dropdown-form-btn">Trigger DAG</button>
+                        </form>
+                        </li>
+                        <!-- <li><a href="{{ url_for('Airflow.trigger', dag_id=dag_summary.dag_id) }}">Trigger DAG w/ config</a></li> -->
+                    </ul>
+                </div>
+            </div>
+        </li>
+        <li>
+            <a href="{{ url_for('GbDagDependenciesView.list', dag=dag_summary.dag_id) }}">
+                <span class="material-icons" aria-hidden="true">filter_center_focus</span>
+                Filtrar
+            </a>
+        </li>
+        <li class="float-right">
+            <a href="" data-dismiss="modal">
+                <span class="material-icons" aria-hidden="true">close</span>
+                Close
+            </a>
+        </li>
+    </ul>
+</div>
+
+<table class="table table-striped">
+<thead>
     <tr>
-        <th>Start Date</th>
-        <td>{{ dag_data.start_date }}</td>
+        <th colspan="2">Dag Details</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Owner</td>
+        <td>{{dag_summary.owners}}</td>
     </tr>
     <tr>
-        <th>End Date</th>
-        <td>{{dag_data.end_date}}</td>
+        <td>Tags</td>
+        <td>{{dag_summary.tags}}</td>
     </tr>
     <tr>
-        <th>State</th>
-        <td>{{ dag_data.state }}</td>
+        <td>Schedule Interval</td>
+        <td>{{ dag_summary.schedule_interval }} ({{dag_summary.timetable_description}})</td>
+    </tr>
+</tbody>
+</table>
+
+<table class="table table-striped">
+<thead>
+    <tr>
+        <th colspan="2">DAG Runs Summary</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Total Runs Displayed</td>
+        <td>{{dag_summary.count_run}}</td>
     </tr>
     <tr>
-        <th>Schedule Date</th>
-        <td>{{dag_data.execution_date}}</td>
+        <td>Last Run Date</td>
+        <td>{{dag_summary.last_run_date}}</td>
     </tr>
     <tr>
-        <th>Date Interval Start</th>
-        <td>{{dag_data.data_interval_start}}</td>
+        <td>Next Dag Run</td>
+        <td>{{dag_summary.next_dagrun}}</td>
     </tr>
     <tr>
-        <th>Date Interval End</th>
-        <td>{{dag_data.data_interval_end}}</td>
+        <td>Min Run Duration</td>
+        <td>{{dag_summary.min_run_duration}}</td>
     </tr>
+    <tr>
+        <td>Avg Run Duration</td>
+        <td>{{dag_summary.avg_run_duration}}</td>
+    </tr>
+    <tr>
+        <td>Max Run Duration</td>
+        <td>{{dag_summary.max_run_duration}}</td>
+    </tr>
+</tbody>
+</table>
+
+<table class="table table-striped">
+<thead>
+    <tr>
+        <th colspan="2">Task Summary</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Total Tasks</td>
+        <td>{{dag_summary.total_tasks}}</td>
+    </tr>
+    {% for operator in operator_summary %}
+    <tr>
+        <td>{{operator.operator}}</td>
+        <td>{{operator.total_operator}}</td>
+    </tr>
+    {% endfor %}
+</tbody>
 </table>
