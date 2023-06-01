@@ -1,0 +1,29 @@
+name: Testes Unitários
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Teste Unitário - Todas as Versões do Airflow
+    strategy:
+      matrix:
+        airflow-version: ['2.0.0', '2.1.0', '2.3.4']  # Adicione todas as versões do Airflow que deseja testar
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v2
+
+      - name: Configurar ambiente Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Instalar dependências
+        run: |
+          pip install pytest
+          pip install apache-airflow==${{ matrix.airflow-version }}
+
+      - name: Executar testes unitários
+        run: pytest tests/sensor/test_gb_external_task_sensor.py::TestGbExternalTaskSensor::test_gb_external_task_sensor_last_valid -s
