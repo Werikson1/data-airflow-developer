@@ -24,7 +24,7 @@ class TestGbExternalTaskSensor:
     def setup_method(self):
         self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
         self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
-        settings.engine = create_engine('sqlite:///:memory:', echo=True)
+        settings.engine = create_engine('sqlite:///:memory:', echo=True, connect_args={'check_same_thread': False})
         settings.Session = sessionmaker(bind=settings.engine)
 
 
