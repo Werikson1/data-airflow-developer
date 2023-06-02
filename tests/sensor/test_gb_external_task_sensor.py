@@ -7,6 +7,8 @@ from airflow.utils.state import DagRunState
 from airflow.utils.timezone import datetime
 from airflow.utils.types import DagRunType
 from airflow.exceptions import AirflowException
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from tests.test_utils.db import clear_db_runs
 from dags.libs.gb_external_task_sensor import GbExternalTaskSensor
@@ -19,8 +21,11 @@ DEV_NULL = "/dev/null"
 
 class TestGbExternalTaskSensor:
     def setup_method(self):
-        self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
-        self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
+    self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
+    self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
+    settings.engine = create_engine('sqlite:///:memory:', echo=True)
+    settings.Session = sessionmaker(bind=settings.engine)
+
 
     def create_dag_runs(self, dag, config):
         for conf in config:
