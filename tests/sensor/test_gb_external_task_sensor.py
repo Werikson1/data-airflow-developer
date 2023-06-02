@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from airflow import settings
 from airflow.models import DagBag, TaskInstance
@@ -22,9 +23,11 @@ DEV_NULL = "/dev/null"
 
 class TestGbExternalTaskSensor:
     def setup_method(self):
+        if os.path.exists("test.db"):
+            os.remove("test.db")
         self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
         self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
-        settings.engine = create_engine('sqlite:///:memory:', echo=True, connect_args={'check_same_thread': False})
+        settings.engine = create_engine('sqlite:///test.db', echo=True)
         settings.Session = sessionmaker(bind=settings.engine)
 
 
