@@ -27,5 +27,10 @@ jobs:
           pip install pytest
           pip install apache-airflow==${{ matrix.airflow-version }}
 
+      - name: Inicializar SQLite
+        run: |
+          echo "" > airflow.db
+          export AIRFLOW__CORE__SQL_ALCHEMY_CONN="sqlite:///$(pwd)/airflow.db"
+
       - name: Executar testes unitários
         run: pytest tests/sensor/test_gb_external_task_sensor.py::TestGbExternalTaskSensor::test_gb_external_task_sensor_last_valid -s
