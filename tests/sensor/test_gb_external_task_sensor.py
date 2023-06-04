@@ -15,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from tests.test_utils.db import clear_db_runs
 from dags.libs.gb_external_task_sensor import GbExternalTaskSensor
 
+
 DEFAULT_DATE = datetime(2023, 1, 1)
 TASK_SENSOR_ID = "test_gb_external_task_sensor_check"
 DAG_A = 'DAG_A'
@@ -27,7 +28,7 @@ class TestGbExternalTaskSensor:
             os.remove("test.db")
         self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
         self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
-        settings.engine = create_engine('sqlite:///test.db', echo=True)
+        settings.engine = create_engine("sqlite:///$(pwd)/airflow.db", pool_size=10, max_overflow=20)
         settings.Session = sessionmaker(bind=settings.engine)
 
 
