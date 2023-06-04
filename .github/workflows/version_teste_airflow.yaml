@@ -25,6 +25,7 @@ jobs:
       - name: Instalar dependências
         run: |
           pip install pytest
+          pip install SQLAlchemy
           pip install apache-airflow==${{ matrix.airflow-version }}
 
       - name: Inicializar SQLite
