@@ -27,14 +27,11 @@ jobs:
           pip install pytest
           pip install apache-airflow==${{ matrix.airflow-version }}
 
-      - name: Baixar arquivo do banco de dados do SQLite
-        run: |
-          curl -o airflow.db <URL_DO_ARQUIVO_DO_BANCO_DE_DADOS>
-
       - name: Inicializar SQLite
         run: |
+          echo "" > airflow.db
           export AIRFLOW__CORE__SQL_ALCHEMY_CONN="sqlite:///$(pwd)/airflow.db"
-          airflow db init
+
       - name: Executar migrações do Airflow
         run: airflow db init
 
