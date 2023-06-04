@@ -28,7 +28,8 @@ class TestGbExternalTaskSensor:
             os.remove("test.db")
         self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
         self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
-        settings.engine = create_engine("sqlite:///$(pwd)/airflow.db", pool_size=10, max_overflow=20)
+        db_path = os.path.join(os.getcwd(), "airflow.db")
+        settings.engine = create_engine(f"sqlite:///{db_path}", pool_size=10, max_overflow=20)
         settings.Session = sessionmaker(bind=settings.engine)
 
 
