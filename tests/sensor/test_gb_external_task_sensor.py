@@ -11,6 +11,7 @@ from airflow.exceptions import AirflowException
 
 from sqlalchemy import create_engine
 
+
 from tests.test_utils.db import clear_db_runs
 from dags.libs.gb_external_task_sensor import GbExternalTaskSensor
 
@@ -32,6 +33,7 @@ class TestGbExternalTaskSensor:
         
            
 
+
     def create_dag_runs(self, dag, config):
         for conf in config:
             dag.create_dagrun(state=conf['state'],
@@ -46,7 +48,7 @@ class TestGbExternalTaskSensor:
 
     def test_gb_external_task_sensor_last_valid(self):
         clear_db_runs()
-        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="0 1 * * *")
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
         # Necessário colocar 1 hora da manhã para gerar o calculo correto do intervalo
         config = [
             {'state': DagRunState.SUCCESS, 'execution_date': datetime(2023, 1, 1, 1)},
@@ -95,7 +97,7 @@ class TestGbExternalTaskSensor:
 
     def test_gb_external_task_sensor_last_valid_failed_dep(self):
         clear_db_runs()
-        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="0 1 * * *")
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
         # Necessário colocar 1 hora da manhã para gerar o calculo correto do intervalo
         config = [
             {'state': DagRunState.SUCCESS, 'execution_date': datetime(2023, 1, 1, 1)},
@@ -198,7 +200,7 @@ class TestGbExternalTaskSensor:
 
     def test_gb_external_task_sensor_last_in_range(self):
         clear_db_runs()
-        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="0 1 * * *")
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
         # Necessário colocar 1 hora da manhã para gerar o calculo correto do intervalo
         config = [
             {'state': DagRunState.FAILED, 'execution_date': datetime(2023, 1, 1, 1)},
@@ -256,7 +258,7 @@ class TestGbExternalTaskSensor:
 
     def test_gb_external_task_sensor_last_success_in_range(self):
         clear_db_runs()
-        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="0 1 * * *")
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
         # Necessário colocar 1 hora da manhã para gerar o calculo correto do intervalo
         config = [
             {'state': DagRunState.FAILED, 'execution_date': datetime(2023, 1, 1, 1)},
