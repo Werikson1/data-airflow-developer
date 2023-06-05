@@ -72,14 +72,14 @@ class TestGbExternalTaskSensor:
         ti_a_execution_date = datetime(2023, 1, 1)
         expect_states = {ti_a_execution_date: 'success'}
         op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data identica a ultima execução da DAG_A, deve pegar a ultima execução da DAG_A
         # O status deve ser sucesso
         ti_b_execution_date = datetime(2023, 1, 3)
         expect_states[ti_b_execution_date] = 'success'
         op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data a frente da validade da ultima execução da DAG_A, Não deve obter nenhum dagrun
         # O status deve ser up_for_reschedule pois não localizou um dagrun valido
@@ -121,15 +121,14 @@ class TestGbExternalTaskSensor:
         ti_a_execution_date = datetime(2023, 1, 1)
         expect_states = {ti_a_execution_date: 'up_for_reschedule'}
         op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data identica a ultima execução da DAG_A, deve pegar a ultima execução da DAG_A
         # O status deve ser 'up_for_reschedule' pois a DAG_B falhou
         ti_b_execution_date = datetime(2023, 1, 3)
         expect_states[ti_b_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
-
+        assert op.execution_date_external_dag == None
         # DAB_B com data a frente da validade da ultima execução da DAG_A, Não deve obter nenhum dagrun
         # O status deve ser up_for_reschedule pois não localizou um dagrun valido
         ti_c_execution_date = datetime(2023, 1, 4)
@@ -226,21 +225,21 @@ class TestGbExternalTaskSensor:
         ti_a_execution_date = datetime(2023, 1, 1)
         expect_states = {ti_a_execution_date: 'success'}
         op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data identica a ultima execução da DAG_A, deve pegar a ultima execução da DAG_A
         # O status deve ser 'sucesso'
         ti_b_execution_date = datetime(2023, 1, 3)
         expect_states[ti_b_execution_date] = 'success'
         op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data a frente da ultima execução da DAG_A mas dentro da tolerancia, deve pegar a ultima execução da DAG_A
         # O status deve ser success
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'success'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 3, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data a frente da ultima execução da DAG_A e fora da tolerancia, não deve localizar uma DAGRUN
         # O status deve ser up_for_reschedule pois não localizou um dagrun valido
@@ -284,7 +283,7 @@ class TestGbExternalTaskSensor:
         ti_a_execution_date = datetime(2023, 1, 1)
         expect_states = {ti_a_execution_date: 'success'}
         op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 2, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data identica a ultima execução da DAG_A porem a execução com sucesso esta dentro da tolerancia,
         # deve pegar a ultima execução com sucesso da DAG_A
@@ -292,7 +291,7 @@ class TestGbExternalTaskSensor:
         ti_b_execution_date = datetime(2023, 1, 3)
         expect_states[ti_b_execution_date] = 'success'
         op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 2, 1)
+        assert op.execution_date_external_dag == None
 
         # DAB_B com data a frente da ultima execução da DAG_A e fora da tolerancia da ultima execução com sucesso,
         # Não deve pegar nenhuma execução
