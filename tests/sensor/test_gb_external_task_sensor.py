@@ -10,7 +10,6 @@ from airflow.utils.types import DagRunType
 from airflow.exceptions import AirflowException
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from tests.test_utils.db import clear_db_runs
 from dags.libs.gb_external_task_sensor import GbExternalTaskSensor
@@ -30,14 +29,8 @@ class TestGbExternalTaskSensor:
         self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
         db_path = os.path.join(os.getcwd(), "airflow.db")
         settings.engine = create_engine("sqlite:////home/runner/airflow/airflow.db")
-        settings.Session = sessionmaker(bind=settings.engine)
         
-    def teardown_method(self):
-        if hasattr(settings.Session, 'remove'):
-            settings.Session.remove()
-        elif hasattr(settings.Session, 'close_all'):
-            settings.Session.close_all()    
-
+           
 
     def create_dag_runs(self, dag, config):
         for conf in config:
