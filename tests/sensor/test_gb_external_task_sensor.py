@@ -85,7 +85,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag is None
+        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -134,7 +134,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag is None
+        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -246,7 +246,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 5)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag is None
+        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -299,7 +299,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag is None
+        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
