@@ -106,7 +106,7 @@ class TestGbExternalTaskSensor:
 
         dag_b = DAG(DAG_B,
                     default_args=self.args,
-                    schedule_interval="0 1 * * *")
+                    schedule_interval="@daily")
         op = GbExternalTaskSensor(
             task_id=TASK_SENSOR_ID,
             external_dag_id=DAG_A,
@@ -147,7 +147,7 @@ class TestGbExternalTaskSensor:
 
         dag_b = DAG(DAG_B,
                     default_args=self.args,
-                    schedule_interval="0 1 * * *")
+                    schedule_interval="@daily")
 
         with pytest.raises(AirflowException) as e_info:
             GbExternalTaskSensor(
@@ -172,7 +172,7 @@ class TestGbExternalTaskSensor:
 
         dag_b = DAG(DAG_B,
                     default_args=self.args,
-                    schedule_interval="0 1 * * *")
+                    schedule_interval="@daily")
 
         with pytest.raises(AirflowException) as e_info:
             GbExternalTaskSensor(
@@ -209,7 +209,7 @@ class TestGbExternalTaskSensor:
 
         dag_b = DAG(DAG_B,
                     default_args=self.args,
-                    schedule_interval="0 1 * * *")
+                    schedule_interval="@daily")
         op = GbExternalTaskSensor(
             task_id=TASK_SENSOR_ID,
             external_dag_id=DAG_A,
@@ -267,7 +267,7 @@ class TestGbExternalTaskSensor:
 
         dag_b = DAG(DAG_B,
                     default_args=self.args,
-                    schedule_interval="0 1 * * *")
+                    schedule_interval="@daily")
         op = GbExternalTaskSensor(
             task_id=TASK_SENSOR_ID,
             external_dag_id=DAG_A,
