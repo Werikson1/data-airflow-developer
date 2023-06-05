@@ -31,6 +31,12 @@ class TestGbExternalTaskSensor:
         db_path = os.path.join(os.getcwd(), "airflow.db")
         settings.engine = create_engine("sqlite:////home/runner/airflow/airflow.db")
         settings.Session = sessionmaker(bind=settings.engine)
+        
+    def teardown_method(self):
+        if hasattr(settings.Session, 'remove'):
+            settings.Session.remove()
+        elif hasattr(settings.Session, 'close_all'):
+            settings.Session.close_all()    
 
 
     def create_dag_runs(self, dag, config):
