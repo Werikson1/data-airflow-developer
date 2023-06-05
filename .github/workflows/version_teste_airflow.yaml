@@ -31,7 +31,7 @@ jobs:
       - name: Inicializar SQLite
         run: |
           echo "" > airflow.db
-          export AIRFLOW__CORE__SQL_ALCHEMY_CONN="sqlite:///$(pwd)/airflow.db"
+          export AIRFLOW__CORE__SQL_ALCHEMY_CONN="sqlite:////tmp/airflow/airflow.db"
 
       - name: Executar migrações do Airflow
         run: airflow db init
