@@ -1,5 +1,4 @@
 import pytest
-import os
 
 from airflow import settings
 from airflow.models import DagBag, TaskInstance
@@ -8,12 +7,10 @@ from airflow.utils.state import DagRunState
 from airflow.utils.timezone import datetime
 from airflow.utils.types import DagRunType
 from airflow.exceptions import AirflowException
-
-from sqlalchemy import create_engine
+import pendulum
 
 from tests.test_utils.db import clear_db_runs
 from dags.libs.gb_external_task_sensor import GbExternalTaskSensor
-
 
 DEFAULT_DATE = datetime(2023, 1, 1)
 TASK_SENSOR_ID = "test_gb_external_task_sensor_check"
@@ -23,15 +20,8 @@ DEV_NULL = "/dev/null"
 
 class TestGbExternalTaskSensor:
     def setup_method(self):
-        if os.path.exists("test.db"):
-            os.remove("test.db")
         self.dagbag = DagBag(dag_folder=DEV_NULL, include_examples=False)
         self.args = {"owner": "airflow", "start_date": DEFAULT_DATE}
-        db_path = os.path.join(os.getcwd(), "airflow.db")
-        settings.engine = create_engine("sqlite:////home/runner/airflow/airflow.db")
-        
-           
-
 
     def create_dag_runs(self, dag, config):
         for conf in config:
@@ -62,6 +52,7 @@ class TestGbExternalTaskSensor:
         op = GbExternalTaskSensor(
             task_id=TASK_SENSOR_ID,
             external_dag_id=DAG_A,
+            dependency_mode=GbExternalTaskSensor.LAST_VALID,
             dag=dag_b,
             timeout=2,
         )
@@ -85,7 +76,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
+        assert op.execution_date_external_dag is None
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -111,6 +102,7 @@ class TestGbExternalTaskSensor:
         op = GbExternalTaskSensor(
             task_id=TASK_SENSOR_ID,
             external_dag_id=DAG_A,
+            dependency_mode=GbExternalTaskSensor.LAST_VALID,
             dag=dag_b,
             timeout=2,
         )
@@ -134,7 +126,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
+        assert op.execution_date_external_dag is None
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -164,6 +156,22 @@ class TestGbExternalTaskSensor:
                 task_id=TASK_SENSOR_ID,
                 external_dag_id=DAG_A,
                 dependency_mode=GbExternalTaskSensor.LAST_SUCCESS_IN_RANGE,
+                dag=dag_b,
+                timeout=2,
+            )
+
+    def test_gb_external_task_sensor_custom(self):
+        #Campo tolerance é obrigatorio nos modo LAST_IN_RANGE e LAST_SUCCESS_IN_RANGE
+
+        dag_b = DAG(DAG_B,
+                    default_args=self.args,
+                    schedule_interval="@daily")
+
+        with pytest.raises(AirflowException) as e_info:
+            GbExternalTaskSensor(
+                task_id=TASK_SENSOR_ID,
+                external_dag_id=DAG_A,
+                dependency_mode=GbExternalTaskSensor.CUSTOM,
                 dag=dag_b,
                 timeout=2,
             )
@@ -246,7 +254,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 5)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
+        assert op.execution_date_external_dag is None
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -299,7 +307,7 @@ class TestGbExternalTaskSensor:
         ti_c_execution_date = datetime(2023, 1, 4)
         expect_states[ti_c_execution_date] = 'up_for_reschedule'
         op.run(start_date=ti_c_execution_date, end_date=ti_c_execution_date, ignore_ti_state=True)
-        assert op.execution_date_external_dag == datetime(2023, 1, 1, 1)
+        assert op.execution_date_external_dag is None
 
         # Obtem o status do sensor
         tis = self.get_ti_states()
@@ -308,10 +316,170 @@ class TestGbExternalTaskSensor:
         for ti in tis:
             assert expect_states[ti.execution_date] == ti.state
 
-    # session = settings.Session()
-    # execs = session.query(DagRun).filter(
-    #     DagRun.dag_id == 'DAG_A'
-    # ).all()
-    #
-    # for e in execs:
-    #     print(f'{e.execution_date} - {e.data_interval_start} - {e.data_interval_end}')
+    def test_gb_external_task_sensor_last_today(self):
+        clear_db_runs()
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
+
+        config = [
+            {'state': DagRunState.SUCCESS, 'execution_date': pendulum.yesterday()},
+            {'state': DagRunState.SUCCESS, 'execution_date': pendulum.today()},
+        ]
+        self.create_dag_runs(dag_a, config)
+
+        dag_b = DAG(DAG_B,
+                    default_args=self.args,
+                    schedule_interval="@daily")
+        op = GbExternalTaskSensor(
+            task_id=TASK_SENSOR_ID,
+            external_dag_id=DAG_A,
+            dependency_mode=GbExternalTaskSensor.LAST_TODAY,
+            dag=dag_b,
+            timeout=2,
+        )
+
+        # DAB_B com data anterior a DAG_A, deve pegar o dagrun mais atual com status de sucesso da DAG_A
+        # O status deve ser 'sucesso'
+        ti_a_execution_date = pendulum.yesterday()
+        expect_states = {ti_a_execution_date: 'success'}
+        op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag == pendulum.today()
+
+        # DAB_B com data da DAG_A, deve pegar o dagrun mais atual com status de sucesso da DAG_A
+        # O status deve ser 'sucesso'
+        ti_b_execution_date = pendulum.now()
+        expect_states[ti_b_execution_date] = 'success'
+        op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag == pendulum.today()
+
+        # Obtem o status do sensor
+        tis = self.get_ti_states()
+
+        # Valida todos os status
+        for ti in tis:
+            assert expect_states[ti.execution_date] == ti.state
+
+    def test_gb_external_task_sensor_last_today_failed(self):
+        clear_db_runs()
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
+
+        #Sem execução no dia atual
+        config = [
+            {'state': DagRunState.SUCCESS, 'execution_date': pendulum.yesterday()},
+        ]
+        self.create_dag_runs(dag_a, config)
+
+        dag_b = DAG(DAG_B,
+                    default_args=self.args,
+                    schedule_interval="@daily")
+        op = GbExternalTaskSensor(
+            task_id=TASK_SENSOR_ID,
+            external_dag_id=DAG_A,
+            dependency_mode=GbExternalTaskSensor.LAST_TODAY,
+            dag=dag_b,
+            timeout=2,
+        )
+
+        # DAB_B com data de ontem, não deve encotrar dag run da DAG A pois não tem execução na data de hoje
+        # O status deve ser 'up_for_reschedule'
+        ti_a_execution_date = pendulum.yesterday()
+        expect_states = {ti_a_execution_date: 'up_for_reschedule'}
+        op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag is None
+
+        # DAB_B com data de hoje, não deve encotrar dag run da DAG A pois não tem execução na data de hoje
+        # O status deve ser 'up_for_reschedule'
+        ti_b_execution_date = pendulum.yesterday()
+        expect_states[ti_b_execution_date] = 'up_for_reschedule'
+        op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag is None
+
+        # Obtem o status do sensor
+        tis = self.get_ti_states()
+
+        # Valida todos os status
+        for ti in tis:
+            assert expect_states[ti.execution_date] == ti.state
+
+    def test_gb_external_task_sensor_last(self):
+        clear_db_runs()
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
+
+        # Sem execução no dia atual
+        config = [
+            {'state': DagRunState.SUCCESS, 'execution_date': pendulum.yesterday()},
+            {'state': DagRunState.SUCCESS, 'execution_date': pendulum.today()},
+        ]
+        self.create_dag_runs(dag_a, config)
+
+        dag_b = DAG(DAG_B,
+                    default_args=self.args,
+                    schedule_interval="@daily")
+        op = GbExternalTaskSensor(
+            task_id=TASK_SENSOR_ID,
+            external_dag_id=DAG_A,
+            dependency_mode=GbExternalTaskSensor.LAST,
+            dag=dag_b,
+            timeout=2,
+        )
+
+        # Deve sempre pegar a DAG_A mais atual
+        # O status deve ser 'success'
+        ti_a_execution_date = pendulum.yesterday()
+        expect_states = {ti_a_execution_date: 'success'}
+        op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag == pendulum.today()
+
+        # O status deve ser 'success'
+        ti_b_execution_date = pendulum.now()
+        expect_states[ti_b_execution_date] = 'success'
+        op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag == pendulum.today()
+
+        # Obtem o status do sensor
+        tis = self.get_ti_states()
+
+        # Valida todos os status
+        for ti in tis:
+            assert expect_states[ti.execution_date] == ti.state
+
+    def test_gb_external_task_sensor_last_failed(self):
+        clear_db_runs()
+        dag_a = DAG(DAG_A, default_args=self.args, schedule_interval="@daily")
+
+        # Sem execução no dia atual
+        config = [
+            {'state': DagRunState.SUCCESS, 'execution_date': pendulum.yesterday()},
+            {'state': DagRunState.FAILED, 'execution_date': pendulum.today()},
+        ]
+        self.create_dag_runs(dag_a, config)
+
+        dag_b = DAG(DAG_B,
+                    default_args=self.args,
+                    schedule_interval="@daily")
+        op = GbExternalTaskSensor(
+            task_id=TASK_SENSOR_ID,
+            external_dag_id=DAG_A,
+            dependency_mode=GbExternalTaskSensor.LAST,
+            dag=dag_b,
+            timeout=2,
+        )
+
+        # Deve sempre pegar a DAG_A mais atual, que no caso esta como falha
+        # O status deve ser 'up_for_reschedule'
+        ti_a_execution_date = pendulum.yesterday()
+        expect_states = {ti_a_execution_date: 'up_for_reschedule'}
+        op.run(start_date=ti_a_execution_date, end_date=ti_a_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag == pendulum.today()
+
+        # O status deve ser 'up_for_reschedule'
+        ti_b_execution_date = pendulum.now()
+        expect_states[ti_b_execution_date] = 'up_for_reschedule'
+        op.run(start_date=ti_b_execution_date, end_date=ti_b_execution_date, ignore_ti_state=True)
+        assert op.execution_date_external_dag == pendulum.today()
+
+        # Obtem o status do sensor
+        tis = self.get_ti_states()
+
+        # Valida todos os status
+        for ti in tis:
+            assert expect_states[ti.execution_date] == ti.state

@@ -41,7 +41,7 @@ child_task1 = GbExternalTaskSensor(
 child_task2 = GbExternalTaskSensor(
     task_id="child_task2",
     external_dag_id="dag_test_sensor_parent_2",
-    external_task_id=None,
+    dependency_mode=GbExternalTaskSensor.last_valid,
     failed_states=['failed'],
     dag=dag
 )
@@ -50,7 +50,17 @@ child_task2 = GbExternalTaskSensor(
 child_task3 = GbExternalTaskSensor(
     task_id="child_task3",
     external_dag_id="dag_test_sensor_parent_3",
-    external_task_id=None,
+    dependency_mode=GbExternalTaskSensor.LAST_IN_RANGE,
+    tolerance=10,
+    failed_states=['failed'],
+    dag=dag
+)
+
+child_task4 = GbExternalTaskSensor(
+    task_id="child_task3",
+    external_dag_id="dag_test_sensor_parent_4",
+    dependency_mode=GbExternalTaskSensor.LAST_IN_RANGE,
+    tolerance=10,
     failed_states=['failed'],
     dag=dag
 )
