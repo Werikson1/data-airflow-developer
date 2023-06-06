@@ -24,6 +24,7 @@ jobs:
 
       - name: Instalar dependências
         run: |
+          pip install --upgrade markupsafe
           pip install pytest
           pip install SQLAlchemy
           pip install apache-airflow==${{ matrix.airflow-version }}
