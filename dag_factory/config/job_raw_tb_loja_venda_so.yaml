@@ -1,5 +1,5 @@
 Head:
-  DocId: "tb_loja_venda_so"
+  DocId: "tb_loja_venda_so1"
   Version: "v1"
   StartTime: "2023-01-01 00:00:00"
   Schedule: "0 9 * * *"
