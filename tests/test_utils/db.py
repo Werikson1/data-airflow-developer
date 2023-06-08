@@ -17,7 +17,7 @@
 # under the License.
 from __future__ import annotations
 
-from airflow.jobs.triggerer_job_runner import TriggererJobRunner
+
 from airflow.models import (
 
     DagRun,
@@ -29,7 +29,6 @@ from airflow.utils.session import create_session
 
 def clear_db_runs():
     with create_session() as session:
-        session.query(TriggererJobRunner).delete()
         session.query(Trigger).delete()
         session.query(DagRun).delete()
         session.query(TaskInstance).delete()
