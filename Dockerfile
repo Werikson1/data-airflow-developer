@@ -1,6 +1,9 @@
 ARG AIRFLOW_UID="50000"
 FROM apache/airflow:2.3.4
 
+# Install specific version of markupsafe
+RUN pip install MarkupSafe==2.1.3
+
 # Correção do pacote da azure
 RUN pip uninstall  --yes azure-storage \
     && pip install -U azure-storage-blob apache-airflow-providers-microsoft-azure==1.1.0
