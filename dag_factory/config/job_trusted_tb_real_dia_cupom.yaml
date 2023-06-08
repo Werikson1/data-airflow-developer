@@ -16,8 +16,12 @@ Table:
   TableId: "tb_real_dia_cupom"
 
 Task:
-  Operator: "BigQueryExecuteQueryOperator"
-  Sql: "CALL prc_load_tb_real_dia_cupom"
+  Operator: "BigQueryInsertJobOperator"
+  Query: "CALL prc_load_tb_real_dia_cupom"
+  # Configuration:
+  #   Query:
+  #     Query: "CALL prc_load_tb_real_dia_cupom"
+  #     UseLegacySql: False
 
 DataQuality:
   Operator: "DummyOperator"

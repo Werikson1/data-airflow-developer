@@ -7,7 +7,7 @@ from util import RetryTimes, DelayTime, SensorWaitTime
 class Handler:
     available_operator = [
         'SapDataServicesOperator',
-        'BigQueryExecuteQueryOperator'
+        'BigQueryInsertJobOperator'
     ]
 
     def __init__(self, data, output):

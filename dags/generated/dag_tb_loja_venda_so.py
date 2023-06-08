@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
-from libs.sap_data_services_operator import SapDataServicesOperator
+from libs.providers.grupoboticario.operators.sap_data_services_operator import SapDataServicesOperator
 
 default_args = {
     'owner': 'Gerencia: Front, Coord: RGM',
@@ -33,8 +33,8 @@ with dag:
         trigger_rule='all_done'
     )
 
-    dq_tb_loja_venda_so = DummyOperator(
-        task_id='dq_tb_loja_venda_so'
+    dqe_tb_loja_venda_so = DummyOperator(
+        task_id='dqe_tb_loja_venda_so'
     )
 
-    job_tb_loja_venda_so >> dq_tb_loja_venda_so
+    job_tb_loja_venda_so >> dqe_tb_loja_venda_so

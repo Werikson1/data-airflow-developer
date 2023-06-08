@@ -1,8 +1,9 @@
 {% extends "template_base.j2" %}
 
 {%- block import %}
-{%- if task.Operator == "BigQueryExecuteQueryOperator" %}
-from libs.bigquery_operator import BigQueryExecuteQueryOperator
+{%- if task.Operator == "BigQueryInsertJobOperator" %}
+from libs.providers.grupoboticario.operators.fake_bigquery import BigQueryInsertJobOperator
+# from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 {%- endif %}
 {%- if dependencies|length > 0 %}
 from libs.gb_external_task_sensor import GbExternalTaskSensor
@@ -21,22 +22,34 @@ from libs.gb_external_task_sensor import GbExternalTaskSensor
         failed_states=['failed', 'skipped', 'upstream_failed']
     )
 
-    dq_{{dependency.TableId}} = BigQueryExecuteQueryOperator(
-        task_id='dq_{{dependency.TableId}}',
-        sql= 'CALL prc_data_quality',
-        use_legacy_sql=False,
-        depends_on_past=False,
-        priority="BATCH"
+    dqv_{{dependency.TableId}} = BigQueryInsertJobOperator(
+        task_id='dqv_{{dependency.TableId}}',
+        configuration={
+            'query': {
+                'query': 'CALL prc_data_quality',
+                'useLegacySql': False,
+                'priority': 'BATCH'
+            },
+        },
+        depends_on_past=False
     )
     {% endfor %}
 
-    {%- if task.Operator == "BigQueryExecuteQueryOperator" %}
-    job_{{head.DocId}} = BigQueryExecuteQueryOperator(
+    {%- if task.Operator == "BigQueryInsertJobOperator" %}
+    job_{{head.DocId}} = BigQueryInsertJobOperator(
         task_id='job_{{head.DocId}}',
-        sql= '{{task.Sql}}',
-        use_legacy_sql=False,
-        depends_on_past=False,
-        priority="BATCH"
+        {%- if task.Query %}
+        configuration={
+            'query': {
+                'query': '{{task.Query}}',
+                'useLegacySql': False,
+                'priority': 'BATCH'
+            }
+        },
+        {%- elif task.Configuration %}
+        configuration={{task.Configuration}},
+        {%- endif %}
+        depends_on_past=False
     )
     {%- endif %}
 
@@ -44,6 +57,6 @@ from libs.gb_external_task_sensor import GbExternalTaskSensor
 
 {%- block dependency %}
     {% for dependency in dependencies %}
-    sensor_{{dependency.TableId}} >> dq_{{dependency.TableId}} >> job_{{head.DocId}}
+    sensor_{{dependency.TableId}} >> dqv_{{dependency.TableId}} >> job_{{head.DocId}}
     {%- endfor %}
 {%- endblock %}

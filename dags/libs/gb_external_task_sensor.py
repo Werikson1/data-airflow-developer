@@ -49,7 +49,7 @@ class GbExternalTaskSensor(ExternalTaskSensor):
                  *,
                  failed_states: Optional[Iterable[str]] = [],
                  execution_date_fn: Optional[Callable] = None,
-                 dependency_mode: str = None,
+                 dependency_mode = valid_dependency_modes,
                  tolerance: int = None,
                  mode="reschedule",
                  **kwargs):
