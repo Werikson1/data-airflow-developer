@@ -44,4 +44,4 @@ jobs:
         run: airflow db init
 
       - name: Executar testes unitários
-        run: pytest tests/sensor/test_gb_external_task_sensor.py::TestGbExternalTaskSensor::test_gb_external_task_sensor_last_valid -s
+        run: pytest 
