@@ -19,7 +19,8 @@ from libs.gb_external_task_sensor import GbExternalTaskSensor
         external_task_id='dq_{{dependency.TableId}}',
         poke_interval={{dependency.PokeInterval}}*60,
         timeout=10*60,
-        failed_states=['failed', 'skipped', 'upstream_failed']
+        failed_states=['failed', 'skipped', 'upstream_failed'],
+        dependency_mode='{{dependency.DependencyMode}}'
     )
 
     dqv_{{dependency.TableId}} = BigQueryInsertJobOperator(
