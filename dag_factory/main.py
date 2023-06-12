@@ -16,14 +16,21 @@ if __name__ == "__main__":
     os.environ['TEMPLATE_PATH'] = '/templates'
     os.environ['DAG_RAW_TEMPLATE'] = 'template_raw.j2'
     os.environ['DAG_TRUSTED_TEMPLATE'] = 'template_trusted.j2'
+    # os.environ['DAG_TEMPLATE'] = 'template.j2'
+    os.environ['DAG_FOLDER'] = 'dags/generated/'
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output", help="Output folder for generated DAG files", default='dags/generated/')
+    parser.add_argument("-c", "--config", help="Dag config filename")
+    parser.add_argument("-o", "--output", help="Pasta Output para arquivo DAG gerado", default='dags/generated/')
     args = parser.parse_args()
 
     output = args.output
 
     path = os.path.dirname(os.path.abspath(__file__)) + os.environ['CONFIG_PATH']
+
+    if args.config is not None:
+        json_config = loadconfig(path, args.config)
+        invoke(json_config,output)
 
     for config in os.listdir(path):
         json_config = loadconfig(path, config)

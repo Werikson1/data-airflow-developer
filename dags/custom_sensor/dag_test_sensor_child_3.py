@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 
-from libs.last_execution_external_task_sensor import LastExecutionExternalTaskSensor
+from libs.gb_external_task_sensor import GbExternalTaskSensor
 
 def print_task_type(**kwargs):
     """
@@ -30,14 +30,14 @@ dag = DAG(
     tags=['test-airflow'])
 
 
-child_task1 = LastExecutionExternalTaskSensor(
+child_task1 = GbExternalTaskSensor(
     task_id="child_task1",
     external_dag_id="dag_test_sensor_parent_1",
     external_task_id="end_task",
     dag=dag
 )
 
-child_task2 = LastExecutionExternalTaskSensor(
+child_task2 = GbExternalTaskSensor(
     task_id="child_task2",
     external_dag_id="dag_test_sensor_parent_2",
     external_task_id="end_task",
@@ -45,7 +45,7 @@ child_task2 = LastExecutionExternalTaskSensor(
 )
 
 
-child_task3 = LastExecutionExternalTaskSensor(
+child_task3 = GbExternalTaskSensor(
     task_id="child_task3",
     external_dag_id="dag_test_sensor_parent_3",
     external_task_id="end_task",

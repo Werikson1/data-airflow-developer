@@ -34,14 +34,14 @@ const highlightColor = '#000000';
 const upstreamColor = '#2020A0';
 const downstreamColor = '#0000FF';
 const initialStrokeWidth = '1px';
-const highlightStrokeWidth = '5px';
+const highlightStrokeWidth = '2px';
 const duration = 500;
 
 let nodes = dagNodes;
 const fullNodes = nodes;
 const filteredNodes = nodes.filter((n) => edges.some((e) => e.u === n.id || e.v === n.id));
 
-const dependencyIndex = getMetaValue("dependencyIndex");
+const dependencyIndex = getMetaValue("dependency_index");
 const autocompleteUrl = getMetaValue("autocomplete_url");
 
 
@@ -118,13 +118,13 @@ $(".typeahead").typeahead({
   },
 });
 
-$("#search_form").on("reset", () => {
+$("#search_form").on("reset", (e) => {
+  e.preventDefault();
   const query = new URLSearchParams(window.location.search);
   query.delete("search");
   query.delete("dag");
   window.location = `${dependencyIndex}?${query}`;
 });
-
 
 // Preparation of DagreD3 data structures
 let g = new dagreD3.graphlib.Graph()
@@ -222,16 +222,16 @@ function setUpNodeHighlighting(focusItem = null) {
     console.log(nodeId);
     $('#dagModal').modal({});
     $('#dagModal').css('margin-top', '0');
+    $('#dagModalLabel .text-muted').text('Dag:');
     $('#m_dag_id').text(nodeId.substring(4));
-    $('#m_input_dag_id').val(nodeId.substring(4));
     $.ajax({
       type: "GET",
-      url: "gb-dag-details",
+      url: "gb-dag-summary",
       data: {
         dag_id: nodeId.substring(4)
       },
       success: function(data) {
-        $('#dagModal .modal-body').html(data)
+        $('#dagModal .modal-body').html(data);
       }
     });
   });
@@ -299,8 +299,8 @@ d3.select('#searchbox').on('keyup', () => {
 const renderGraph = () => {
   g = new dagreD3.graphlib.Graph()
     .setGraph({
-      nodesep: 15,
-      ranksep: 15,
+      nodesep: 30,
+      ranksep: 100,
       rankdir: arrange,
     })
     .setDefaultEdgeLabel(() => ({ lineInterpolate: 'basis' }));

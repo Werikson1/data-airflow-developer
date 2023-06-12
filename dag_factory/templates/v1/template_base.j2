@@ -28,11 +28,11 @@ with dag:
     {%- block operator %}
     {%- endblock %}
 
-    dq_{{head.DocId}} = DummyOperator(
-        task_id='dq_{{head.DocId}}'
+    dqe_{{head.DocId}} = DummyOperator(
+        task_id='dqe_{{head.DocId}}'
     )
 
     {%- block dependency %}
     {%- endblock %}
 
-    job_{{head.DocId}} >> dq_{{head.DocId}}
+    job_{{head.DocId}} >> dqe_{{head.DocId}}

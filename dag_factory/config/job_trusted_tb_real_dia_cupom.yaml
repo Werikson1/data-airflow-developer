@@ -1,5 +1,5 @@
 Head:
-  DocId: "tb_teste_developer1"
+  DocId: "tb_real_dia_cupom10"
   Version: "v1"
   StartTime: "2023-01-01 00:00:00"
   Schedule: "0 9 * * *"
@@ -16,8 +16,12 @@ Table:
   TableId: "tb_real_dia_cupom"
 
 Task:
-  Operator: "BigQueryExecuteQueryOperator"
-  Sql: "CALL prc_load_tb_real_dia_cupom"
+  Operator: "BigQueryInsertJobOperator"
+  Query: "CALL prc_load_tb_real_dia_cupom"
+  # Configuration:
+  #   Query:
+  #     Query: "CALL prc_load_tb_real_dia_cupom"
+  #     UseLegacySql: False
 
 DataQuality:
   Operator: "DummyOperator"
@@ -25,3 +29,4 @@ DataQuality:
 Dependencies:
   - TableId: tb_loja_venda_so
     PokeInterval: "Short"
+    DependencyMode: 'last_today'

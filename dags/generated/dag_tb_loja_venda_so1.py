@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
-from libs.sap_data_services_operator import SapDataServicesOperator
+from libs.providers.grupoboticario.operators.sap_data_services_operator import SapDataServicesOperator
 
 default_args = {
     'owner': 'Gerencia: Front, Coord: RGM',
@@ -14,7 +14,7 @@ default_args = {
 }
 
 dag = DAG(
-    'dag_tb_loja_venda_so',
+    'dag_tb_loja_venda_so1',
     start_date=datetime.strptime('2023-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'),
     schedule_interval='0 9 * * *',
     default_args=default_args,
@@ -23,8 +23,8 @@ dag = DAG(
 )
 
 with dag:
-    job_tb_loja_venda_so = SapDataServicesOperator(
-        task_id='job_tb_loja_venda_so',
+    job_tb_loja_venda_so1 = SapDataServicesOperator(
+        task_id='job_tb_loja_venda_so1',
         nameJob= 'JOB_GCP_BLZ_RAW_TB_EUD_BLZWEB_ADDRESS',
         G_Delta_Inicio=None,
         G_Delta_Fim=None,
@@ -33,8 +33,8 @@ with dag:
         trigger_rule='all_done'
     )
 
-    dq_tb_loja_venda_so = DummyOperator(
-        task_id='dq_tb_loja_venda_so'
+    dqe_tb_loja_venda_so1 = DummyOperator(
+        task_id='dqe_tb_loja_venda_so1'
     )
 
-    job_tb_loja_venda_so >> dq_tb_loja_venda_so
+    job_tb_loja_venda_so1 >> dqe_tb_loja_venda_so1

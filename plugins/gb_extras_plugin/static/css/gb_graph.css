@@ -1,3 +1,4 @@
+/* 
 span.deferred {
     background-color: mediumpurple;
 }
@@ -76,4 +77,74 @@ g.node.up_for_retry rect {
 
 g.node.upstream_failed rect {
     stroke: orange;
+} 
+*/
+
+g.node.dag rect {
+    stroke: #DFDFDF;
+    fill: #F5F5F5;
+}
+
+g.node .label {
+    text-align: left;
+}
+
+g.node p {
+    margin: 0 0 2px;
+}
+
+g.node .state,
+g.node .date {
+    font-size: .68em;
+}
+
+g.node .label div {
+    padding: 8px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-left: solid 5px #F5F5F5;
+}
+
+g.node.deferred .label div {
+    border-left-color: mediumpurple;
+}
+
+g.node.failed .label div {
+    border-left-color: red;
+}
+
+g.node.queued .label div {
+    border-left-color: gray;
+}
+
+g.node.running .label div {
+    border-left-color: lime;
+}
+
+g.node.scheduled .label div {
+    border-left-color: tan;
+}
+
+g.node.skipped .label div {
+    border-left-color: hotpink;
+}
+
+g.node.success .label div {
+    border-left-color: green;
+}
+
+g.node.up_for_reschedule .label div {
+    border-left-color: turquoise;
+}
+
+g.node.up_for_retry .label div {
+    border-left-color: gold;
+}
+
+g.node.upstream_failed .label div {
+    border-left-color: orange;
+}
+
+g.edgePath {
+    stroke-width: 0.7px;;
 }

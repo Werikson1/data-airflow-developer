@@ -31,10 +31,18 @@ under the License.
 {{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for_asset('graph.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('gb_extras.static', filename='css/gb_graph.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('gb_extras.static', filename='css/gb_modal.css') }}">
 {% endblock %}
 
 {% block content %}
 {{ super() }}
+
+<div id="debug" style="display: none">
+  <p>debug</p>
+  <p>tags: {{tags_filter}}</p>
+  <p>states: {{states_filter}}</p>
+  <p>search: {{search_query}}</p>
+</div>
   <h2>
     {{ title }}
   </h2>
@@ -43,7 +51,7 @@ under the License.
         <form id="tags_filter_form">
           <div class="form-group search-input col-sm-6">
             <select multiple name="tags" id="tags_filter" class="select2-drop-mask form-control">
-              {% for tag in tags %}
+              {% for tag in tags_list %}
                 <option value="{{ tag.name }}" {% if tag.selected %}selected{% endif %}>{{ tag.name }}</option>
               {% endfor %}
             </select>
@@ -52,16 +60,16 @@ under the License.
             {% endif %}
           </div>
         </form>
-        <form id="states_filter_form"></form>
+        <!-- <form id="states_filter_form"></form>
           <div class="form-group search-input col-sm-6">
             <select name="state" id="states_filter" class="select2 js-states form-control">
               <option value="">All Run States</option>
-              {% for state in states %}
+              {% for state in states_list %}
                 <option value="{{state}}" {% if states_filter == state %} selected {% endif %}>{{state}}</option>
               {% endfor %}
             </select>
           </div>
-        </form>
+        </form> -->
       </div>
       <div class="col-sm-6 no-x-padding">
         <form id="search_form">
@@ -127,14 +135,6 @@ under the License.
           <div class="row">
             <span class="btn-group col-md-8">
           </div>
-        </div>
-        <div class="modal-footer">
-          <form method="get" class="form-inline">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" class="form-control" id="m_input_dag_id" name="dag_id">
-              <button type="submit" class="btn">Centralizar</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </form>
         </div>
       </div>
     </div>

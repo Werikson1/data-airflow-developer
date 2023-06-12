@@ -7,7 +7,7 @@ from util import RetryTimes, DelayTime, SensorWaitTime
 class Handler:
     available_operator = [
         'SapDataServicesOperator',
-        'BigQueryExecuteQueryOperator'
+        'BigQueryInsertJobOperator'
     ]
 
     def __init__(self, data, output):
@@ -108,6 +108,8 @@ class Handler:
 
     def create_dag(self):
         try:
+            with open(os.environ['DAG_FOLDER'] + self.filename, 'w+') as file:
+                file.write(self.dag)
             with open(f"{self.output}/{self.filename}", 'w+') as file:
                 file.write(self.dag)
 

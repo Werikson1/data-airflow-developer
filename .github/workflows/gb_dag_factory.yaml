@@ -1,48 +1,88 @@
 name: GB DAG FACTORY
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/dag_factory/config/*.yaml'
   pull_request:
     branches:
       - main
     paths:
       - '**/dag_factory/config/*.yaml'
-    types:
-      - opened
-      - synchronize  
       
 jobs:
-  GB_DAG_FACTORY:
+  GB_DAG_FACTORY_CICD:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT  }}
+          #token: ${{ secrets.GH_PAT  }}
 
       - name: Configurando o ambiente Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
-      - name: Instalando dependencias
+      - name: Instalando as dependencias
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Executar o gerador de DAG
+      - name: Executando o gerador de DAG
         run: |
           set -e
           python dag_factory/main.py --output dags/generated/
 
-      - name: Commit e push do arquivo dag.py
+      - name: Commit e push do arquivo dag.py gerado
         run: |
-          if [ "${{ github.actor }}" != "github-actions[bot]" ]; then
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "noreply@github.com"
-            git add dags/generated/*.py
-            git commit -m "DAG gerada com sucesso!!!" || echo "No changes to commit"
-            git push || echo "No changes to push"
-          fi
+          set -e
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "noreply@github.com"
+          git add dags/generated/*.py
+          git commit -m "DAG gerada com sucesso!!!" || echo "No changes to commit"
+          git push || echo "No changes to push"
+      
+      - name: Inicializar o Airflow Database para validar a DAG
+        run: |
+          airflow db init
 
+      - name: Validando a DAG
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/dags
+          for file in $(find ./dags/generated -name "*.py"); do
+            python $file
+            if [ $? -ne 0 ]; then exit 1; fi
+          done
+
+      # Modulo para validar se a SA já foi usada em outra DAG
+      #- name: Validar uso do ID da SAK
+      #  run: |
+      #    set -e
+      #    import os
+      #    import yaml
+      #    import glob
+      #
+      #          def find_sak_id(file):
+      #              with open(file, 'r') as stream:
+      #                  try:
+      #                      yaml_content = yaml.safe_load(stream)
+      #                      return yaml_content.get('sak_id')
+      #                  except yaml.YAMLError as exc:
+      #                      print(exc)
+      #                      return None
+      #
+      #          sak_ids = []
+      #          for file in glob.glob('./dag_factory/config/*.yaml'):
+      #              sak_id = find_sak_id(file)
+      #              if sak_id in sak_ids:
+      #                  print(f"Erro: ID da SAK {sak_id} já foi usado em outra DAG.")
+      #                  exit(1)
+      #              sak_ids.append(sak_id)
+      #
+      #    print("Validação do ID da SAK concluída.")
+
+        
