@@ -1,5 +1,5 @@
 ARG AIRFLOW_UID="50000"
-FROM apache/airflow:2.3.4
+FROM apache/airflow:2.6.3
 
 # Install specific version of markupsafe
 RUN pip install MarkupSafe==2.1.3
